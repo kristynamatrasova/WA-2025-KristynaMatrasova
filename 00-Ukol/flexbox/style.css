@@ -1,17 +1,31 @@
-.container {
+/* Všeobecné styly */
+body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  
+  .header, .footer {
+    background-color: #d0d0ff;
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  /* Kontejner a sloupce */
+  .container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 1rem;
+    padding: 1rem;
   }
   
   .sidebar {
-    flex: 1 1 200px;
+    width: 200px;
     background-color: #f0f0f0;
     padding: 1rem;
   }
   
   .main {
-    flex: 2 1 400px;
+    flex: 1;
     background-color: #e0e0e0;
     padding: 1rem;
   }
@@ -19,6 +33,10 @@
   @media (max-width: 768px) {
     .container {
       flex-direction: column;
+    }
+  
+    .sidebar {
+      width: 100%;
     }
   }
   
