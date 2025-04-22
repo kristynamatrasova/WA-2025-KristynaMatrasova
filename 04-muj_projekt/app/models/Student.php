@@ -1,74 +1,73 @@
 <?php
 class Student {
-    private $db;
-    private $table_name = "students";
+    private $conn;
+    private $table = "students";
 
     public function __construct($db) {
-        $this->db = $db;
+        $this->conn = $db;
     }
 
-    public function create($firstName, $lastName, $email, $dob, $course) {
-        $query = "INSERT INTO " . $this->table_name . " (first_name, last_name, email, dob, course) 
-                  VALUES (:first_name, :last_name, :email, :dob, :course)";
-
-        $stmt = $this->db->prepare($query);
-
-        // Bind values
-        $stmt->bindParam(":first_name", $firstName);
-        $stmt->bindParam(":last_name", $lastName);
-        $stmt->bindParam(":email", $email);
-        $stmt->bindParam(":dob", $dob);
-        $stmt->bindParam(":course", $course);
+    public function create($firstName, $lastName, $birthDate, $class, $email, $phone, $imagePath) {
+        $query = "INSERT INTO " . $this->table . " (first_name, last_name, birth_date, class, email, phone, profile_image) 
+                  VALUES (:first_name, :last_name, :birth_date, :class, :email, :phone, :profile_image)";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        $stmt->bindParam(':first_name', $firstName);
+        $stmt->bindParam(':last_name', $lastName);
+        $stmt->bindParam(':birth_date', $birthDate);
+        $stmt->bindParam(':class', $class);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':profile_image', $imagePath);
 
         if ($stmt->execute()) {
             return true;
         }
-
         return false;
     }
 
     public function getAll() {
-        $query = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->db->prepare($query);
+        $query = "SELECT * FROM " . $this->table;
+        
+        $stmt = $this->conn->prepare($query);
         $stmt->execute();
+        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getById($id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    public function update($id, $firstName, $lastName, $birthDate, $class, $email, $phone, $imagePath) {
+        $query = "UPDATE " . $this->table . " 
+                  SET first_name = :first_name, last_name = :last_name, birth_date = :birth_date, 
+                      class = :class, email = :email, phone = :phone, profile_image = :profile_image
+                  WHERE id = :id";
 
-    public function update($id, $firstName, $lastName, $email, $dob, $course) {
-        $query = "UPDATE " . $this->table_name . " 
-                  SET first_name = :first_name, last_name = :last_name, email = :email, 
-                      dob = :dob, course = :course WHERE id = :id";
-
-        $stmt = $this->db->prepare($query);
-
-        // Bind values
-        $stmt->bindParam(":id", $id);
-        $stmt->bindParam(":first_name", $firstName);
-        $stmt->bindParam(":last_name", $lastName);
-        $stmt->bindParam(":email", $email);
-        $stmt->bindParam(":dob", $dob);
-        $stmt->bindParam(":course", $course);
+        $stmt = $this->conn->prepare($query);
+        
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':first_name', $firstName);
+        $stmt->bindParam(':last_name', $lastName);
+        $stmt->bindParam(':birth_date', $birthDate);
+        $stmt->bindParam(':class', $class);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':profile_image', $imagePath);
 
         if ($stmt->execute()) {
             return true;
         }
-
         return false;
     }
 
     public function delete($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":id", $id);
-        return $stmt->execute();
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 }
-?>
