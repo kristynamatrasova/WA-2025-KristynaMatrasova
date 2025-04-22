@@ -1,69 +1,74 @@
 <?php
 class Student {
     private $db;
+    private $table_name = "students";
 
     public function __construct($db) {
         $this->db = $db;
     }
 
-    // Vytvoření nového studenta
-    public function create($first_name, $last_name, $email, $dob, $course) {
-        $sql = "INSERT INTO students (first_name, last_name, email, dob, course) 
-                VALUES (:first_name, :last_name, :email, :dob, :course)";
-        
-        $stmt = $this->db->prepare($sql);
-        
-        return $stmt->execute([
-            ':first_name' => $first_name,
-            ':last_name' => $last_name,
-            ':email' => $email,
-            ':dob' => $dob,
-            ':course' => $course
-        ]);
+    public function create($firstName, $lastName, $email, $dob, $course) {
+        $query = "INSERT INTO " . $this->table_name . " (first_name, last_name, email, dob, course) 
+                  VALUES (:first_name, :last_name, :email, :dob, :course)";
+
+        $stmt = $this->db->prepare($query);
+
+        // Bind values
+        $stmt->bindParam(":first_name", $firstName);
+        $stmt->bindParam(":last_name", $lastName);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":dob", $dob);
+        $stmt->bindParam(":course", $course);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 
-    // Získání všech studentů
     public function getAll() {
-        $sql = "SELECT * FROM students ORDER BY created_at DESC";
-        $stmt = $this->db->prepare($sql);
+        $query = "SELECT * FROM " . $this->table_name;
+        $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Získání studenta podle ID
     public function getById($id) {
-        $sql = "SELECT * FROM students WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Aktualizace informací o studentovi
-    public function update($id, $first_name, $last_name, $email, $dob, $course) {
-        $sql = "UPDATE students 
-                SET first_name = :first_name,
-                    last_name = :last_name,
-                    email = :email,
-                    dob = :dob,
-                    course = :course
-                WHERE id = :id";
-        
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':first_name' => $first_name,
-            ':last_name' => $last_name,
-            ':email' => $email,
-            ':dob' => $dob,
-            ':course' => $course
-        ]);
+    public function update($id, $firstName, $lastName, $email, $dob, $course) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET first_name = :first_name, last_name = :last_name, email = :email, 
+                      dob = :dob, course = :course WHERE id = :id";
+
+        $stmt = $this->db->prepare($query);
+
+        // Bind values
+        $stmt->bindParam(":id", $id);
+        $stmt->bindParam(":first_name", $firstName);
+        $stmt->bindParam(":last_name", $lastName);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":dob", $dob);
+        $stmt->bindParam(":course", $course);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 
-    // Mazání studenta
     public function delete($id) {
-        $sql = "DELETE FROM students WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':id' => $id]);
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":id", $id);
+        return $stmt->execute();
     }
 }
 ?>
