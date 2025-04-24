@@ -14,6 +14,7 @@ class BookController {
 
     public function createBook() {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            // Získání údajů z formuláře
             $title = htmlspecialchars($_POST['title']);
             $author = htmlspecialchars($_POST['author']);
             $category = htmlspecialchars($_POST['category']);
@@ -23,6 +24,16 @@ class BookController {
             $isbn = htmlspecialchars($_POST['isbn']);
             $description = htmlspecialchars($_POST['description']);
             $link = htmlspecialchars($_POST['link']);
+
+            // Získání ID přihlášeného uživatele
+            session_start();
+            $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;  // Předpokládám, že ID uživatele je ve session
+
+            if (!$user_id) {
+                // Pokud není uživatel přihlášen, vyhoďte chybu nebo přesměrujte
+                echo "Musíte být přihlášený, abyste mohl přidat knihu.";
+                exit();
+            }
 
             // Zpracování nahraných obrázků
             $imagePaths = [];
@@ -38,8 +49,8 @@ class BookController {
                 }
             }
 
-            // Uložení knihy do DB - dočasné řešení, než budeme mít výpis knih
-            if ($this->bookModel->create($title, $author, $category, $subcategory, $year, $price, $isbn, $description, $link, $imagePaths)) {
+            // Uložení knihy do DB s ID přihlášeného uživatele
+            if ($this->bookModel->create($title, $author, $category, $subcategory, $year, $price, $isbn, $description, $link, $imagePaths, $user_id)) {
                 header("Location: ../controllers/book_list.php");
                 exit();
             } else {
